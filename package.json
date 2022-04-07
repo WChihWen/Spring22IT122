@@ -1,0 +1,23 @@
+{
+  "name": "spring22it122",
+  "version": "1.0.0",
+  "description": "IT122 class with javascript 2 in Spring 2022",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WChihWen/Spring22IT122.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WChihWen/Spring22IT122/issues"
+  },
+  "homepage": "https://github.com/WChihWen/Spring22IT122#readme",
+  "dependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

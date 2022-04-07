@@ -1,0 +1,1 @@
+console.log('Hello, this is Chih Wen Wang\' about page!');
