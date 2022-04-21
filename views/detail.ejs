@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="css/styles.css">
+
+<h2>User Details</h2>
+<hr>
+
+<%if (user != null){ %>
+    <b>ID:</b> <%= user.id %> <br>
+    <b>Name:</b> <%= user.name %> <br>
+    <b>Age:</b> <%= user.age %> <br>
+    <b>Gender:</b> <%= user.gender %> <br>
+    <b>State:</b> <%= user.state %> <br>
+<%}else{ %>
+    User was not found!
+<%} %>
+<br><br>
+<a href="/">Go back to home page.</a>

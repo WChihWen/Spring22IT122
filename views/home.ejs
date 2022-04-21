@@ -1,0 +1,9 @@
+<link rel="stylesheet" href="css/styles.css">
+
+<h2>Home Page<h2>
+<hr>
+<h2>My Users</h2>
+
+<% users.forEach(function(user) { %>    
+    <li><a href="/detail?name=<%= user.name %>"><%= user.name %></a></li> 
+<% }); %>
