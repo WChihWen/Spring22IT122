@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="css/styles.css?2">
+
+<div class="main">
+    <h2>Home Page<h2>
+    <h4><a href="/about">About Me</a></h4>
+    <hr>
+    <h2>My Users</h2>
+
+    <% users.forEach(function(user) { %>    
+        <li><a href="/detail?name=<%= user.name %>"><%= user.name %></a></li> 
+    <% }); %>
+    <br><br>
+</div>
