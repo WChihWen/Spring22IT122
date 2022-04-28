@@ -17,3 +17,28 @@ export const getItem = (name) => {
     });
 };
 
+
+export const addItem = (newItem) => {
+    let found = users.find((element) => {
+        return element.name == newItem.name;
+    }); 
+
+    if(typeof(found) == 'undefined'){
+        users.push(newItem);
+        return { status: 'success', mymessage: "Name[" + newItem.name + "] was already added!", myobj: users};
+    }else{
+        return { status: 'failure', mymessage: "Name[" + newItem.name + "] already exists!", myobj: users};
+    }      
+};
+
+export const deleteItem = (name) => {
+    let ln = users.length;
+    const result = users.filter(e => e.name != name); 
+    
+    if(ln == result.length){
+        return { status: 'failure', mymessage: "Name[" + name + "] was already deleted failed!", myobj: users};
+    }else{
+        users = result;
+        return { status: 'success', mymessage: "Name[" + name + "] was already deleted!", myobj: users};
+    }
+};
