@@ -50,7 +50,7 @@ describe('Test deleteItem whether they are equal:', () => {
     });
   
     it('JSON objects should not be equal', () => {                
-        // let re = dt.deleteItem('Jayson1'); // Jayson1 was not in dt, so it is not in dt.
+        // let re = dt.deleteItem('Jayson1'); // Jayson1 was not in dt, so it is failure.
         // expect(re.status).to.equal('failure'); 
         
         let myTest = [            
