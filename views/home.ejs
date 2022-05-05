@@ -2,12 +2,18 @@
 
 <div class="main">
     <h2>Home Page<h2>
-    <h4><a href="/about">About Me</a></h4>
+    <h4>
+        
+        <a href="/import">Import Members</a>&nbsp&nbsp&nbsp 
+        <a href="/about">About Me</a> 
+    </h4>
     <hr>
-    <h2>My Users</h2>
+    <h2>My Members</h2>
 
     <% users.forEach(function(user) { %>    
-        <li><a href="/detail?name=<%= user.name %>"><%= user.name %></a></li> 
+        <li><a href="/detail?name=<%= user.name %>"><%= user.name %></a>   &nbsp&nbsp 
+            <a href="/delete?id=<%= user.id %>&name=<%= user.name %>"><img src="images/delete.ico" alt="delete"></a> 
+        </li> 
     <% }); %>
     <br><br>
 </div>
