@@ -44,9 +44,9 @@ app.get('/delete', (req,res) => {
     var myquery = { 'id': req.query.id };
     Members.deleteOne(myquery, function(err, obj) {
         if (err) {
-            res.render('message', {message: {type:'delete', status: 'failed', message: '['+ req.query.name +'] was deleted failed! err:[' + err +']'}});   
+            res.render('message', {message: {type:'delete', status: 'Failed!', message: '['+ req.query.name +'] was deleted failed! err:[' + err +']'}});   
         }else{
-            res.render('message', {message: {type:'delete', status: 'succeeded', message: '['+ req.query.name +'] has been deleted!'}});  
+            res.render('message', {message: {type:'delete', status: 'Succeeded!', message: '['+ req.query.name +'] has been deleted!'}});  
         }           
     });
 });
@@ -56,9 +56,9 @@ app.get('/import', (req,res) => {
     var myobj = dt.getAll();
     Members.insertMany(myobj, function(err) {
         if (err) {            
-            res.render('message', {message: {type:'import', status: 'failed', message: err}});   
+            res.render('message', {message: {type:'import', status: 'Failed!', message: err}});   
         }else{
-            res.render('message', {message: {type:'import', status: 'succeeded', message: 'Members have been imported!'}});   
+            res.render('message', {message: {type:'import', status: 'Succeeded!', message: 'Members have been imported!'}});   
         }                     
     });        
 });
