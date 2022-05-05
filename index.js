@@ -3,6 +3,7 @@
 import * as dt from "./data.js";
 //import { parse } from "querystring";
 import express from 'express';
+import {Members} from "./DBModels/Members.js";
 
 const app = express();
 app.set('port', process.env.PORT || 3000);
@@ -16,7 +17,12 @@ app.set('view engine', 'ejs');
 app.get('/', (req,res) => {
     res.type('text/html');
     //res.render('home',{ users: [ { name : "Jayson", age : 39,  gender: "male" },  {name : "Jessie Lin", age : 33,  gender: "female" }]  });
-    res.render('home',{ users: dt.getAll()});
+    //res.render('home',{ users: dt.getAll()});
+    Members.find({}).lean()
+        .then((member) => {
+            res.render('home',{ users: member});
+        })        
+        .catch(err => next(err));    
 });
    
 app.get('/about', (req,res) => {
@@ -26,8 +32,38 @@ app.get('/about', (req,res) => {
 
 app.get('/detail', (req,res) => {
     res.type('text/html');    
-    res.render('detail', {user: dt.getItem(req.query.name)});    
+    Members.findOne({"name": req.query.name }).lean()
+    .then((member) => {
+        res.render('detail', {user: member});  
+    })
+    .catch(err => next(err));       
 });
+
+app.get('/delete', (req,res) => {
+    res.type('text/html');  
+    var myquery = { 'id': req.query.id };
+    Members.deleteOne(myquery, function(err, obj) {
+        if (err) {
+            res.render('message', {message: {type:'delete', status: 'failed', message: '['+ req.query.name +'] was deleted failed! err:[' + err +']'}});   
+        }else{
+            res.render('message', {message: {type:'delete', status: 'succeeded', message: '['+ req.query.name +'] has been deleted!'}});  
+        }           
+    });
+});
+
+app.get('/import', (req,res) => {
+    res.type('text/html');     
+    var myobj = dt.getAll();
+    Members.insertMany(myobj, function(err) {
+        if (err) {            
+            res.render('message', {message: {type:'import', status: 'failed', message: err}});   
+        }else{
+            res.render('message', {message: {type:'import', status: 'succeeded', message: 'Members have been imported!'}});   
+        }                     
+    });        
+});
+
+
 
 // define 404 handler
 app.use((req,res) => {
