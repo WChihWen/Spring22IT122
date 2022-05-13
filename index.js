@@ -4,6 +4,7 @@ import * as dt from "./data.js";
 //import { parse } from "querystring";
 import express from 'express';
 import {Members} from "./DBModels/Members.js";
+import cors from 'cors';
 
 const app = express();
 app.set('port', process.env.PORT || 3000);
@@ -63,6 +64,65 @@ app.get('/import', (req,res) => {
     });        
 });
 
+//=============================================Start API===================================================
+//API get all items
+app.get('/api/members', (req,res) => {
+    Members.find({}).lean()
+        .then((member) => {
+            if (member) {
+                // res.json sets appropriate status code and response header
+                res.json(member);
+            } else {
+                return res.status(500).send('Database Error occurred');
+            }
+        })        
+        .catch(err => next(err));     
+});
+
+// API get a single item
+app.get('/api/member', (req,res) => {
+    Members.findOne({"name": req.query.name }).lean()
+    .then((member) => {
+        res.json(member);
+    })
+    .catch(err => next(err));       
+});
+
+//API add or update member
+app.get('/api/add', (req,res) => {    
+    const newMember = {'id':req.query.id, 'name': req.query.name, 'age': req.query.age, 'gender': req.query.gender, 'state': req.query.state };
+    Members.updateOne({'id':req.query.id}, newMember, {upsert:true}, (err, result) => {
+        // if (err) {
+        //     res.json({type:'add/update', status: 'Failed!', message: err});
+        // }else{
+        //     res.json({type:'add/update', status: 'Succeeded!', message: 'Members have been added or updated!'});
+        // }      
+        if (err) {            
+            res.render('message', {message: {type:'add/update', status: 'Failed!', message: err}});   
+        }else{
+            res.render('message', {message: {type:'add/update', status: 'Succeeded!', message: '['+ req.query.name + '] have been added or updated!'}});   
+        }     
+    });
+});
+
+//API delete a member
+app.get('/api/delete', (req,res) => {    
+    var myquery = { 'id': req.query.id };
+    Members.deleteOne(myquery, function(err, obj) {
+        // if (err) {
+        //     res.json({type:'delete', status: 'Failed!', message: '['+ req.query.name +'] was deleted failed! err:[' + err +']'});
+        // }else{
+        //     res.json({type:'delete', status: 'Succeeded!', message: '['+ req.query.name +'] has been deleted!'});
+        // }    
+        if (err) {
+            res.render('message', {message: {type:'delete', status: 'Failed!', message: '['+ req.query.name +'] was deleted failed! err:[' + err +']'}});   
+        }else{
+            res.render('message', {message: {type:'delete', status: 'Succeeded!', message: '['+ req.query.name +'] has been deleted!'}});  
+        }           
+    });
+});
+
+//=============================================End API===================================================
 
 
 // define 404 handler
@@ -73,6 +133,9 @@ app.use((req,res) => {
    });
 
 app.listen(3000);
+
+
+
 
 
 // Node js syntax
