@@ -12,7 +12,7 @@ app.use(express.static('./public'));
 app.use(express.urlencoded()); //Parse URL-encoded bodies
 app.use(express.json());
 app.set('view engine', 'ejs');
-
+app.use('/api', cors());
 
 //Express syntax
 app.get('/', (req,res) => {
