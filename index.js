@@ -89,9 +89,9 @@ app.get('/api/member/:name', (req,res) => {
 });
 
 //API add or update member
-app.get('/api/add', (req,res) => {    
-    const newMember = {'id':req.query.id, 'name': req.query.name, 'age': req.query.age, 'gender': req.query.gender, 'state': req.query.state };
-    Members.updateOne({'id':req.query.id}, newMember, {upsert:true}, (err, result) => {
+app.get('/api/add/:id/:name/:age/:gender/:state', (req,res) => {    
+    const newMember = {'id':req.params.id, 'name': req.params.name, 'age': req.params.age, 'gender': req.params.gender, 'state': req.params.state };
+    Members.updateOne({'id':req.params.id}, newMember, {upsert:true}, (err, result) => {
         // if (err) {
         //     res.json({type:'add/update', status: 'Failed!', message: err});
         // }else{
@@ -100,7 +100,7 @@ app.get('/api/add', (req,res) => {
         if (err) {            
             res.render('message', {message: {type:'add/update', status: 'Failed!', message: err}});   
         }else{
-            res.render('message', {message: {type:'add/update', status: 'Succeeded!', message: '['+ req.query.name + '] have been added or updated!'}});   
+            res.render('message', {message: {type:'add/update', status: 'Succeeded!', message: '['+ req.params.name + '] have been added or updated!'}});   
         }     
     });
 });
