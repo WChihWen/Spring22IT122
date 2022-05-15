@@ -80,8 +80,8 @@ app.get('/api/members', (req,res) => {
 });
 
 // API get a single item
-app.get('/api/member', (req,res) => {
-    Members.findOne({"name": req.query.name }).lean()
+app.get('/api/member/:name', (req,res) => {
+    Members.findOne({"name": req.params.name }).lean()
     .then((member) => {
         res.json(member);
     })
@@ -106,8 +106,8 @@ app.get('/api/add', (req,res) => {
 });
 
 //API delete a member
-app.get('/api/delete', (req,res) => {    
-    var myquery = { 'id': req.query.id };
+app.get('/api/delete/:id/:name', (req,res) => {    
+    var myquery = { 'id': req.params.id };
     Members.deleteOne(myquery, function(err, obj) {
         // if (err) {
         //     res.json({type:'delete', status: 'Failed!', message: '['+ req.query.name +'] was deleted failed! err:[' + err +']'});
@@ -115,9 +115,9 @@ app.get('/api/delete', (req,res) => {
         //     res.json({type:'delete', status: 'Succeeded!', message: '['+ req.query.name +'] has been deleted!'});
         // }    
         if (err) {
-            res.render('message', {message: {type:'delete', status: 'Failed!', message: '['+ req.query.name +'] was deleted failed! err:[' + err +']'}});   
+            res.render('message', {message: {type:'delete', status: 'Failed!', message: '['+ req.params.name +'] was deleted failed! err:[' + err +']'}});   
         }else{
-            res.render('message', {message: {type:'delete', status: 'Succeeded!', message: '['+ req.query.name +'] has been deleted!'}});  
+            res.render('message', {message: {type:'delete', status: 'Succeeded!', message: '['+ req.params.name +'] has been deleted!'}});  
         }           
     });
 });
