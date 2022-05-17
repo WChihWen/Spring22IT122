@@ -5,61 +5,39 @@ import * as dt from "../data.js";
 describe('Test getItems whether they are equal:', () => {
     let myTest = { id: 1, name : "Jayson", age : 39,  gender: "male", state:"WA"};
     
-    it('JSON objects should be equal', () => {
+    it('Jayson\'s info should be equal the object named myTest', () => {
         expect(myTest).to.deep.equal(dt.getItem('Jayson'));       
     });
   
-    it('JSON objects should not be equal', () => {
+    it('Jessie Lin\'s info should not be equal the object named myTest', () => {
         expect(myTest).to.not.equal(dt.getItem('Jessie Lin'));       
     });
 });
 
-describe('Test addItems whether they are equal:', () => {    
-    let myTest = [
-        { id: 1, name : "Jayson", age : 39,  gender: "male", state: "WA"},
-        { id: 2, name : "Jessie Lin", age : 33,  gender: "female", state: "NY"},
-        { id: 3, name : "Jenny", age : 40,  gender: "female", state: "WA"},
-        { id: 4, name : "Jack", age : 29,  gender: "male", state: "NY"},
-        { id: 5, name : "Reder", age : 41,  gender: "male", state: "NY"},
-        { id: 99, name: "Jayson Wang", age: 391, gender: "male1",state: "WA1"}
-        ];
-    it('JSON objects should be equal', () => {
+describe('Test addItems whether they are equal:', () => {   
+    it('Jason object,Jayson Wang, was added successfully', () => {
         let newItem = {"id":99,"name":"Jayson Wang","age":391,"gender":"male1","state":"WA1"};
-        dt.addItem(newItem);
-        expect(myTest).to.deep.equal(dt.getAll());   
+        let re = dt.addItem(newItem);
+        expect('success').to.equal(re.status);   
     });
   
-    it('JSON objects should not be equal', () => {
+    it('Duplicate item is not added successfully', () => {
         let newItem = {"id":99,"name":"Jayson","age":391,"gender":"male1","state":"WA1"};
-        dt.addItem(newItem);
-        expect(myTest).to.not.equal(dt.getAll());       
+        let re = dt.addItem(newItem);
+        expect('success').to.not.equal(re.status);       
     });
 });
 
 describe('Test deleteItem whether they are equal:', () => {        
-    it('JSON objects should be equal', () => {     
-        let myTest = [
-            { id: 1, name : "Jayson", age : 39,  gender: "male", state: "WA"},
-            { id: 2, name : "Jessie Lin", age : 33,  gender: "female", state: "NY"},
-            { id: 3, name : "Jenny", age : 40,  gender: "female", state: "WA"},
-            { id: 4, name : "Jack", age : 29,  gender: "male", state: "NY"},
-            { id: 5, name : "Reder", age : 41,  gender: "male", state: "NY"}
-            ];  
+    it('Jayson Wang should be deleted successfully', () => {     
+      
         let re = dt.deleteItem('Jayson Wang');
-        expect(myTest).to.deep.equal(re.myobj);       
+        expect('success').to.deep.equal(re.status);       
     });
   
-    it('JSON objects should not be equal', () => {                
-        // let re = dt.deleteItem('Jayson1'); // Jayson1 was not in dt, so it is failure.
-        // expect(re.status).to.equal('failure'); 
+    it('Jayson1 should not be deleted successfully because it does not exist', () => { 
         
-        let myTest = [            
-            { id: 2, name : "Jessie Lin", age : 33,  gender: "female", state: "NY"},
-            { id: 3, name : "Jenny", age : 40,  gender: "female", state: "WA"},
-            { id: 4, name : "Jack", age : 29,  gender: "male", state: "NY"},
-            { id: 5, name : "Reder", age : 41,  gender: "male", state: "NY"}
-            ];  
         let re = dt.deleteItem('Jayson1');
-        expect(myTest).to.not.equal(re.myobj);   
+        expect('success').to.not.equal(re.status);   
     });
  });
