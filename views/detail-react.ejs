@@ -23,19 +23,30 @@
             padding: "2em"         
         }; 
 
-        const User = (props) => {                  
-            return (
-                <div style={mystyle}> 
-                    <h2>User Details</h2>
-                    <hr />                   
-                    <b>ID:</b> {props.data.id }<br />
-                    <b>Name:</b> {props.data.name} <br />
-                    <b>Age:</b> {props.data.age} <br />
-                    <b>Gender:</b> {props.data.gender} <br />
-                    <b>State:</b> {props.data.state} <br /><br /><br />
-                    <a href="/">Go back to home page.</a> 
-                </div>    
-            );
+        const User = (props) => {   
+            if(props.data != null){
+				return (
+					<div style={mystyle}> 
+						<h2>User Details</h2>
+						<hr />                   
+						<b>ID:</b> {props.data.id }<br />
+						<b>Name:</b> {props.data.name} <br />
+						<b>Age:</b> {props.data.age} <br />
+						<b>Gender:</b> {props.data.gender} <br />
+						<b>State:</b> {props.data.state} <br /><br /><br />
+						<a href="/">Go back to home page.</a> 
+					</div>    
+				);
+			}else{
+				return (
+					<div style={mystyle}> 
+						<h2>User Details</h2>
+						<hr />
+						<b>User was not found! </b><br /><br /><br />
+						<a href="/">Go back to home page.</a> 
+					</div>
+					);
+			}            
           }
         
         const container = document.getElementById('root');
