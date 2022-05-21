@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home Page</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <link rel="stylesheet" href="css/styles.css?2">
+  </head>
+  <body>
+    <div class="main">
+        <div id="myHead"></div>
+        <div id="root"></div>      
+    </div>   
+    
+    <script type="text/babel">
+        const users=<%- users%>;                       
+        // click event handler   
+        const mystyle = {            
+            padding: "1em"         
+        }; 
+
+        const MyHead =() =>{
+            return (
+                <div style={mystyle}>
+                    <h4>
+                        <br /><br />
+                        <a style={mystyle} href="/import">Import Members</a>
+                        <a style={mystyle} href="/about">About Me</a>        
+                    </h4>
+                    <hr />
+                    <h4>  
+                        <a style={mystyle} href="/api/members">API-Get All Members</a>
+                        <a style={mystyle} href="/api/member/Jayson">API-Get a Member</a>
+                        <a style={mystyle} href="/api/add/6/Frank/66/male/OC">API-Add or Update a Member</a>
+                        <a style={mystyle} href="/api/delete/6/Frank">API-Delete a Member</a>
+                    </h4>
+                    <hr />
+                </div>
+            );
+        }        
+        const Members = (props) => {
+            // props is an array
+            const listItems = props.data.map((item) =>
+                <li key={item.name} id={item.id} >                    
+                    <a data-id={item.id} data-name={item.name} href="#"  onClick={props.clickHandler}>{item.name}</a>                    
+                </li>
+                );
+
+            return (
+                <div style={mystyle}>
+                    <h2>My Members</h2>
+                    <ul>{listItems}</ul><br /><br />
+                </div>                
+                );
+        }
+        
+        const showDetail = (event) => {     
+            //alert(event.target.getAttribute("data-id"));
+            //alert(event.target.getAttribute("data-name"));
+            //alert(event.target.innerText);
+            window.location.href = "/detail?name=" + event.target.innerText;
+        }      
+        
+        const containerHead = document.getElementById('myHead');
+        const myHead = ReactDOM.createRoot(containerHead);
+        myHead.render(<MyHead />);
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<Members data={users} clickHandler={showDetail} />);
+
+    </script>
+    <!--
+      Note: this page is a great way to try React but it's not suitable for production.
+      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+      Read this section for a production-ready setup with JSX:
+      https://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project
+
+      In a larger project, you can use an integrated toolchain that includes JSX instead:
+      https://reactjs.org/docs/create-a-new-react-app.html
+
+      You can also use React without JSX, in which case you can remove Babel:
+      https://reactjs.org/docs/react-without-jsx.html
+    -->
+  </body>
+</html>
