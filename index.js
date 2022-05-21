@@ -15,30 +15,37 @@ app.set('view engine', 'ejs');
 app.use('/api', cors());
 
 //Express syntax
-app.get('/', (req,res) => {
+app.get('/', (req,res,next) => {
     res.type('text/html');
     //res.render('home',{ users: [ { name : "Jayson", age : 39,  gender: "male" },  {name : "Jessie Lin", age : 33,  gender: "female" }]  });
     //res.render('home',{ users: dt.getAll()});
     Members.find({}).lean()
         .then((member) => {
-            res.render('home',{ users: member});
+            //res.render('home',{ users: member});
+            res.render('home-react',{ users: JSON.stringify( member)});
         })        
         .catch(err => next(err));    
 });
    
+
+app.get('/detail', (req,res,next) => {
+    res.type('text/html');    
+    Members.findOne({"name": req.query.name }).lean()
+    .then((member) => {
+        //res.render('detail', {user: member});  
+        res.render('detail-react', {user:  JSON.stringify(member)});  
+    })
+    .catch(err => next(err));       
+});
+
+
+
 app.get('/about', (req,res) => {
     res.type('text/html');
     res.render('about');
 });
 
-app.get('/detail', (req,res) => {
-    res.type('text/html');    
-    Members.findOne({"name": req.query.name }).lean()
-    .then((member) => {
-        res.render('detail', {user: member});  
-    })
-    .catch(err => next(err));       
-});
+
 
 app.get('/delete', (req,res) => {
     res.type('text/html');  
@@ -66,7 +73,7 @@ app.get('/import', (req,res) => {
 
 //=============================================Start API===================================================
 //API get all items
-app.get('/api/members', (req,res) => {
+app.get('/api/members', (req,res,next) => {
     Members.find({}).lean()
         .then((member) => {
             if (member) {
@@ -80,7 +87,7 @@ app.get('/api/members', (req,res) => {
 });
 
 // API get a single item
-app.get('/api/member/:name', (req,res) => {
+app.get('/api/member/:name', (req,res,next) => {
     Members.findOne({"name": req.params.name }).lean()
     .then((member) => {
         res.json(member);
@@ -123,6 +130,7 @@ app.get('/api/delete/:id/:name', (req,res) => {
 });
 
 //=============================================End API===================================================
+
 
 
 // define 404 handler
