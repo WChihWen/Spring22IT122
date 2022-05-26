@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home Page</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <link rel="stylesheet" href="css/styles.css?2">
+  </head>
+  <body>
+    <div class="main">
+        <div id="header"></div>
+        <div id="root"></div>      
+    </div>   
+    
+    <script type="text/babel">                        
+        // click event handler   
+        const mystyle = {            
+            padding: "1em"         
+        };         
+
+        const Members = (props) => {
+            // props is an array
+            //<a data-id={item.id} data-name={item.name} href={`/detail?name=${item.name}`}>{item.name}</a>  
+            //<a href="#" onClick={props.clickHandler}>{item.name}</a>   
+            const listItems = props.data.map((item) =>
+                <li key={item.name} id={item._id} >    
+                    <a href="#" onClick={props.clickHandler}>{item.name}</a>   
+                </li>
+                );
+
+            return (
+                <div style={mystyle}>
+                    <h2>Members</h2>
+                    <ul>{listItems}</ul>
+                </div>                
+            );
+        }
+              
+        const ItemDetail = (props) => {
+            return <div style={mystyle}>
+                <hr />
+                <h2>Member Details</h2>
+                <form>
+                    ID: <input type="text" name="id" type="number" value={props.item.id || ""} onChange={props.handleChange} /><br/>
+                    Name: <input type="text" name="name" value={props.item.name || ""} onChange={props.handleChange}/><br/>
+                    Age: <input type="text" name="age" type="number" value={props.item.age || ""} onChange={props.handleChange} /><br/>
+                    Gender: <input type="text" name="gender" value={props.item.gender || ""} onChange={props.handleChange} /><br/>
+                    State: <input type="text" name="state" value={props.item.state || ""} onChange={props.handleChange} /><br/>                    
+                </form>                
+                <br />
+                <button name="clear" onClick={props.clearForm}>Clear</button>&nbsp;&nbsp;
+                <button name="save" onClick={props.saveItem}>Save</button>&nbsp;&nbsp;   
+                <button name="delete" onClick={props.deleteItem}>Delete</button> 
+                <br />                                  
+            </div>
+        }
+
+        class MembersApp extends React.Component {
+            constructor(props) {
+                super(props);         
+                this.state = {
+                    items: <%- users %>,
+                    currentItem: {},
+                    message: ''
+                };    
+                this.selectItem = this.selectItem.bind(this);
+                this.handleChange = this.handleChange.bind(this);               
+                this.clearForm = this.clearForm.bind(this);   
+                this.saveItem = this.saveItem.bind(this);   
+                this.deleteItem = this.deleteItem.bind(this);       
+            }
+
+            // click event handler
+            selectItem = (event) => {
+                const found = this.state.items.find((item) => {
+                    return item.name === event.target.innerText;
+                });
+                this.setState({currentItem: found});
+            }
+            handleChange = (event) => {
+                let newItem = this.state.currentItem;
+                newItem[event.target.name] = event.target.value;
+                this.setState({currentItem: newItem});
+            }
+            
+            clearForm = () => {
+                this.setState({currentItem: {}})
+            }
+           
+            saveItem = () => {
+                // save edits to backend DB                
+                if (this.state.currentItem === {}) return;                
+                if (typeof(this.state.currentItem.name) === 'undefined') {
+                    alert('Name is required!');
+                    return;
+                }
+                let newItem = this.state.currentItem;             
+                fetch("/api/add/", {
+                    method: "POST",
+                    headers: { 
+                        'Content-Type': 'application/json'
+                     },
+                    body: JSON.stringify(newItem)
+                })
+                    .then(res => res.json())
+                    .then((data) => {         
+                        // if this new item, add to list of items
+                        //data.updated => -1 (add or update error);  0: add,  else: update
+                        if (data.updated === 0) {
+                            newItem._id = data._id
+                            let newList = this.state.items;
+                            newList.push(newItem);
+                            this.setState({items: newList, message: data.message});
+                        }else{
+                            this.setState({message: data.message});
+                        }
+                        alert(data.message);
+                    });
+            }
+
+            deleteItem = () => {                
+                if (this.state.currentItem == {}) return;
+                let deleteId = this.state.currentItem._id; 
+                let deleteName = this.state.currentItem.name;
+                
+                fetch("api/delete",{
+                    method: "POST",
+                    headers: { 
+                        'Content-Type': 'application/json'
+                     },
+                    body: JSON.stringify({'_id': deleteId, 'name': deleteName })
+                })
+                    .then(res => res.json())
+                    .then((data) => {
+                        // if delete succeeded, update master list
+                        //data.status => -1: delete fault;  0: not found,  else: delete successful
+                        if (data.status == 0 || data.status == -1) {
+                            this.setState({message: data.message})                            
+                        }else{
+                            let newList = this.state.items.filter(item => {
+                                return item._id != deleteId;
+                            })                            
+                            this.setState({items: newList, currentItem: {}, message: data.message});                            
+                        }
+                        alert(data.message);
+                    })
+            }
+
+            render() {
+                return (
+                    <div style={mystyle}>
+                        <Members data={this.state.items} clickHandler={this.selectItem} />   
+                        <ItemDetail
+                            item={this.state.currentItem}
+                            handleChange={this.handleChange}
+                            clearForm={this.clearForm}
+                            saveItem={this.saveItem}   
+                            deleteItem={this.deleteItem}                      
+                            />                 
+                    </div>
+                );
+            }
+        }
+      
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MembersApp  />);
+        
+    </script>  
+  </body>
+</html>
