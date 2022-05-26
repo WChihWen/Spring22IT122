@@ -17,12 +17,11 @@ app.use('/api', cors());
 //Express syntax
 app.get('/', (req,res,next) => {
     res.type('text/html');
-    //res.render('home',{ users: [ { name : "Jayson", age : 39,  gender: "male" },  {name : "Jessie Lin", age : 33,  gender: "female" }]  });
-    //res.render('home',{ users: dt.getAll()});
     Members.find({}).lean()
         .then((member) => {
             //res.render('home',{ users: member});
-            res.render('home-react',{ users: JSON.stringify( member)});
+            //res.render('home-react',{ users: JSON.stringify( member)});
+            res.render('home-react-UI',{ users: JSON.stringify( member)});
         })        
         .catch(err => next(err));    
 });
@@ -51,8 +50,9 @@ app.get('/delete', (req,res) => {
     res.type('text/html');  
     var myquery = { 'id': req.query.id };
     Members.deleteOne(myquery, function(err, obj) {
-        if (err) {
-            res.render('message', {message: {type:'delete', status: 'Failed!', message: '['+ req.query.name +'] was deleted failed! err:[' + err +']'}});   
+        
+        if (obj.deletedCount == 0) {
+            res.render('message', {message: {type:'delete', status: 'Failed!', message: '['+ req.query.name +'] was not found! err:[' + err +']'}});   
         }else{
             res.render('message', {message: {type:'delete', status: 'Succeeded!', message: '['+ req.query.name +'] has been deleted!'}});  
         }           
@@ -96,39 +96,72 @@ app.get('/api/member/:name', (req,res,next) => {
 });
 
 //API add or update member
+//'/api/add/:id/:name/:age/:gender/:state'
 app.get('/api/add/:id/:name/:age/:gender/:state', (req,res) => {    
     const newMember = {'id':req.params.id, 'name': req.params.name, 'age': req.params.age, 'gender': req.params.gender, 'state': req.params.state };
-    Members.updateOne({'id':req.params.id}, newMember, {upsert:true}, (err, result) => {
-        // if (err) {
-        //     res.json({type:'add/update', status: 'Failed!', message: err});
-        // }else{
-        //     res.json({type:'add/update', status: 'Succeeded!', message: 'Members have been added or updated!'});
-        // }      
+    Members.updateOne({'id':req.params.id}, newMember, {upsert:true}, (err, result) => {          
         if (err) {            
             res.render('message', {message: {type:'add/update', status: 'Failed!', message: err}});   
         }else{
-            res.render('message', {message: {type:'add/update', status: 'Succeeded!', message: '['+ req.params.name + '] have been added or updated!'}});   
+            if (result.matchedCount == 0){
+                res.render('message', {message: {type:'add', status: 'Succeeded!', message: '['+ req.params.name + '] have been added!'}});  
+            }else{
+                res.render('message', {message: {type:'update', status: 'Succeeded!', message: '['+ req.params.name + '] have been updated!'}});  
+            }             
         }     
     });
 });
 
 //API delete a member
 app.get('/api/delete/:id/:name', (req,res) => {    
-    var myquery = { 'id': req.params.id };
-    Members.deleteOne(myquery, function(err, obj) {
-        // if (err) {
-        //     res.json({type:'delete', status: 'Failed!', message: '['+ req.query.name +'] was deleted failed! err:[' + err +']'});
-        // }else{
-        //     res.json({type:'delete', status: 'Succeeded!', message: '['+ req.query.name +'] has been deleted!'});
-        // }    
-        if (err) {
-            res.render('message', {message: {type:'delete', status: 'Failed!', message: '['+ req.params.name +'] was deleted failed! err:[' + err +']'}});   
+    //var myquery = { 'id': req.body.id };
+    var myquery = {'id': req.params.id };
+    Members.deleteOne(myquery, function(err, result) {
+        if (result.deletedCount == 0) {
+            res.render('message', {message: {type:'delete', status: 'Failed!', message: '['+ req.params.name +'] was not found! err:[' + err +']'}});   
         }else{
             res.render('message', {message: {type:'delete', status: 'Succeeded!', message: '['+ req.params.name +'] has been deleted!'}});  
         }           
     });
 });
 
+//*************************for UI*******************************
+app.post('/api/add', (req,res,next) => {    
+    const newMember = {'id':req.body.id, 'name': req.body.name, 'age': req.body.age, 'gender': req.body.gender, 'state': req.body.state };
+
+    Members.updateOne({'id':req.body.id}, newMember, {upsert:true}, (err, result) => {          
+        if (err) { 
+            res.json({updated: -1, _id: -1, message: err}); 
+        }else{
+            if (result.matchedCount == 0){
+                //new and find new name's _id
+                Members.findOne({"name": req.body.name }).lean()
+                    .then((member) => {
+                        res.json({updated: 0, _id: member._id, message: '['+ req.body.name  + '] have been added!'});
+                    })
+                    .catch(err => next(err)); 
+            }else{
+                //update
+                res.json({updated: result.nModified, _id: req.body._id, message: '['+ req.body.name  + '] have been updated!'});
+            }             
+        }     
+    });
+});
+app.post('/api/delete', (req,res) => {    
+    var myquery = { '_id': req.body._id };
+
+    Members.deleteOne(myquery, function(err, result) {
+        if (err) { 
+            res.json({status: -1, message: '['+ req.body.name +'] delete fault! Err:['+ err +']'});  
+        }else{
+            if (result.deletedCount == 0) {
+                res.json({status: 0, message: '['+ req.body.name +'] was not found!'});  
+            }else{
+                res.json({status: result.deletedCount, message: '['+ req.body.name +'] has been deleted!'});            
+            }       
+        }            
+    });
+});
 //=============================================End API===================================================
 
 
@@ -141,44 +174,3 @@ app.use((req,res) => {
    });
 
 app.listen(3000);
-
-
-
-
-
-// Node js syntax
-// http.createServer((req,res) => {
-//     //var path = req.url.toLowerCase();
-//     let url = req.url.split("?"); // separate route from query string
-//     var path = url[0].toLowerCase();
-//     let query = parse(url[1]); // convert query string to a JS object
- 
-//     switch(path) {
-//         case '/':
-//             res.writeHead(200, {'Content-Type': 'text/plain'});
-//             res.end(JSON.stringify(dt.getAll()));
-//             break;
-//         case '/about':
-//             res.writeHead(200, {'Content-Type': 'text/plain'});
-//             var str = 'My name is Chih Wen Wang, and I come from Taiwan. When I was a university student in Taiwan, I studied information technology and management. ';
-//             str +='However, I focused on learning how to build software and let it work on a computer or the Internet. While graduating, I became a programmer at a technology company in my country and worked for almost ten years. ';
-//             str += 'However, my life was changed because I came to the United States with my wife. I have two goals now. One is that I have to improve my English ability. So, I go to study the ESL Program here. Another goal is that I yearn to earn an IT Program degree or certificate in the United States because I do not have any degree in the United States.';
-//             res.end(str);
-//             break;
-
-//         case '/detail':
-//             res.writeHead(200, {'Content-Type': 'text/plain'});   
-
-//             if (dt.getItem(query.name) != null){
-//                 res.end(JSON.stringify(dt.getItem(query.name)));
-//             }else{
-//                 res.end("Name:["+ query.name + "] was not found!");
-//             }
-            
-//             break;
-//         default:
-//             res.writeHead(404, {'Content-Type': 'text/plain'});
-//             res.end('The page('+ path +') was not found!');
-//             break;
-//     }
-// }).listen(process.env.PORT || 3000);
